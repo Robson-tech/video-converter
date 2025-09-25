@@ -18,6 +18,14 @@ spec:
       # As labels aplicadas a cada pod. Deve corresponder ao seletor acima.
       labels:
         app: video-converter
+      # Anotações para o Prometheus.
+      # 'true' indica ao Prometheus para coletar métricas deste pod.
+      # '/metrics' é o endpoint padrão que a biblioteca Flask expõe.
+      # '5000' é a porta onde a aplicação está rodando e expondo as métricas.
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/metrics'
+        prometheus.io/port: '5000'
     spec:
       containers:
         # Define os contêineres que rodarão dentro do pod

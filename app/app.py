@@ -3,11 +3,14 @@ import subprocess
 import uuid
 import logging
 from flask import Flask, request, send_file, jsonify
+from prometheus_flask_exporter import PrometheusMetrics
 
 # Configuração básica de logs
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
+# Adiciona o exportador de métricas do Prometheus à aplicação Flask
+metrics = PrometheusMetrics(app)
 
 # Define o limite máximo de tamanho do arquivo para 100 MB
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 

@@ -120,17 +120,88 @@ Se tudo correr bem, você terá o arquivo `video_convertido.avi` no seu diretór
 
 ## Logs e Debugging
 
-Para depurar ou monitorar a aplicação, você pode visualizar os logs dos pods.
+Para depurar ou monitorar a aplicação, você pode veulizar os logs dos pods.
 
 ```
 # Listar os nomes dos pods
 kubectl get pods
 
-# Visualizar o log de um pod específico
+# Veulizar o log de um pod específico
 kubectl logs <NOME_DO_POD>
 
-# Visualizar os logs de todos os pods do deployment em tempo real
+# Veulizar os logs de todos os pods do deployment em tempo real
 kubectl logs -f -l app=video-converter
 ```
 
 A flag `-l app=video-converter` seleciona todos os pods com essa label, que foi definida no nosso `deployment.yaml`.
+
+## Monitoramento com Prometheus
+
+Adicionado monitoramento à aplicação. O método recomendado é usar o addon do Minikube. Se ele não funcionar, um método alternativo usando Helm é fornecido.
+
+### Método 1: Habilitar o Addon do Minikube (Recomendado)
+
+O Minikube geralmente vem com um addon que facilita a instalação de uma stack de monitoramento.
+
+Primeiro, verifique se o addon está disponível:
+
+```
+minikube addons list
+```
+
+Se o `prometheus` aparecer na lista, habilite-o com o seguinte comando:
+
+```
+minikube addons enable prometheus
+```
+
+Isso pode levar alguns minutos. O Minikube irá baixar as imagens necessárias e configurar o Prometheus e o Grafana no namespace `monitoring`. Após a conclusão, pule para o **Passo 2: Acessar o Painel do Prometheus**.
+
+### Método 2: Instalação com Helm (Alternativa)
+
+Se o addon não estiver disponível ou falhar, use o Helm, o gerenciador de pacotes do Kubernetes.
+
+1. **Instale o Helm**: Se você ainda não o tiver, siga o [guia oficial de instalação do Helm](https://helm.sh/docs/intro/install/).
+2. **Adicione o repositório do Prometheus**:
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+```
+3. **Instale o Prometheus**: O comando a seguir instala a `kube-prometheus-stack`, que inclui Prometheus, Grafana e outros componentes essenciais, em um namespace dedicado chamado `monitoring`.
+```
+helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
+```
+
+### Passo 2: Acessar o Painel do Prometheus
+
+Para acessar a interface web do Prometheus, vamos encaminhar a porta do serviço dele para a sua máquina local. Abra um **novo terminal** e execute:
+
+```
+kubectl port-forward -n monitoring service/prometheus-kube-prometheus-prometheus 9090
+```
+
+> **Nota**: O nome do serviço pode variar ligeiramente dependendo do método de instalação, mas `prometheus-kube-prometheus-prometheus` é o padrão para ambas as abordagens.
+
+Agora, é possível acessar o Prometheus no navegador em: [http://localhost:9090](http://localhost:9090)
+
+### Passo 3: Verificar se a Aplicação é um Alvo (Target)
+
+No painel do Prometheus, navegue até Status > Targets. Você deve encontrar um grupo de alvos (targets) chamado `pod/video-converter/...`. Os dois pods da aplicação devem aparecer com o estado "UP", indicando que o Prometheus está coletando métricas deles com sucesso.
+
+### Passo 4: Consultar Métricas da Aplicação
+
+Agora é possível usar a linguagem de consulta do Prometheus (PromQL) para explorar as métricas. Na aba Graph, experimente as seguintes consultas:
+
+* Contador de requisições HTTP por método e status:
+
+```
+flask_http_requests_total
+```
+
+* Latência (duração) das requisições:
+
+```
+flask_http_requests_latency_seconds_bucket
+```
+
+Após enviar alguns vídeos para conversão (passo 6), execute essas consultas novamente e você verá os dados sendo atualizados, permitindo monitorar o comportamento da aplicação distribuída em tempo real.
