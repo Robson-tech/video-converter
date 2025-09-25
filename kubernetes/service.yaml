@@ -1,0 +1,21 @@
+# apiVersion define a versão da API do Kubernetes
+apiVersion: v1
+# kind especifica que estamos criando um objeto do tipo Service
+kind: Service
+metadata:
+  # O nome do nosso Service
+  name: video-converter-service
+spec:
+  # O tipo de Service. NodePort expõe o serviço em uma porta estática em cada nó do cluster.
+  # Isso facilita o acesso externo em ambientes locais como o Minikube.
+  type: NodePort
+  # O seletor define o conjunto de pods que este serviço irá direcionar o tráfego.
+  # Ele corresponde às labels definidas no nosso Deployment.
+  selector:
+    app: video-converter
+  ports:
+    - protocol: TCP
+      # A porta pela qual o serviço será acessível dentro do cluster
+      port: 80
+      # A porta nos pods para a qual o tráfego será encaminhado
+      targetPort: 5000

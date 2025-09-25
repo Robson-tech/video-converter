@@ -1,0 +1,32 @@
+# apiVersion define a versão da API do Kubernetes que estamos usando para criar este objeto
+apiVersion: apps/v1
+# kind especifica o tipo de objeto que estamos criando, neste caso, um Deployment
+kind: Deployment
+metadata:
+  # O nome do nosso Deployment
+  name: video-converter
+spec:
+  # O número de réplicas (pods) que queremos rodando
+  replicas: 2
+  # O seletor define como o Deployment encontra quais pods gerenciar
+  selector:
+    matchLabels:
+      app: video-converter
+  # O template descreve os pods que serão criados
+  template:
+    metadata:
+      # As labels aplicadas a cada pod. Deve corresponder ao seletor acima.
+      labels:
+        app: video-converter
+    spec:
+      containers:
+        # Define os contêineres que rodarão dentro do pod
+        - name: video-converter-container
+          # A imagem Docker a ser usada. A tag 'latest' é usada aqui.
+          image: video-converter:latest
+          # imagePullPolicy: IfNotPresent garante que o K8s use a imagem local
+          # se ela existir, em vez de tentar baixá-la de um registry.
+          imagePullPolicy: IfNotPresent
+          ports:
+            # A porta que o contêiner expõe
+            - containerPort: 5000
