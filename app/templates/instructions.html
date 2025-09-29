@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Guia de Conversão de Vídeos - FFmpeg{% endblock %}
+
+{% block content %}
+<h1>📹 Guia Completo de Conversão de Vídeos com FFmpeg</h1>
+
+<div class="info-box">
+    <strong>💡 O que é FFmpeg?</strong><br>
+    FFmpeg é uma ferramenta de linha de comando poderosa e gratuita para processamento de áudio e vídeo. 
+    É usado mundialmente por desenvolvedores, editores de vídeo e empresas para conversão, compressão e manipulação de mídia.
+</div>
+
+<h2>🔧 Instalação do FFmpeg</h2>
+
+<h3>Windows:</h3>
+<div class="command-block">
+    <button class="copy-btn" onclick="copyToClipboard(this)">Copiar</button>
+    <pre><code># Opção 1: Via Chocolatey
+choco install ffmpeg
+
+# Opção 2: Via Scoop  
+scoop install ffmpeg
+
+# Opção 3: Download manual do site oficial
+# Baixe de: https://ffmpeg.org/download.html#build-windows</code></pre>
+</div>
+
+<h3>macOS:</h3>
+<div class="command-block">
+    <button class="copy-btn" onclick="copyToClipboard(this)">Copiar</button>
+    <pre><code># Via Homebrew (recomendado)
+brew install ffmpeg
+
+# Via MacPorts
+sudo port install ffmpeg</code></pre>
+</div>
+
+<h3>Linux (Ubuntu/Debian):</h3>
+<div class="command-block">
+    <button class="copy-btn" onclick="copyToClipboard(this)">Copiar</button>
+    <pre><code># Atualizar repositórios
+sudo apt update
+
+# Instalar FFmpeg
+sudo apt install ffmpeg
+
+# Verificar instalação
+ffmpeg -version</code></pre>
+</div>
+
+<h2>📋 Comandos Básicos de Conversão</h2>
+
+<div class="example-section">
+    <h3>Conversão Básica entre Formatos</h3>
+    <div class="command-block">
+        <button class="copy-btn" onclick="copyToClipboard(this)">Copiar</button>
+        <pre><code># Converter MP4 para AVI
+ffmpeg -i video.mp4 video.avi
+
+# Converter AVI para MKV
+ffmpeg -i video.avi video.mkv
+
+# Converter MKV para MP4
+ffmpeg -i video.mkv video.mp4</code></pre>
+    </div>
+</div>
+
+<h2>⚙️ Parâmetros Avançados</h2>
+
+<table class="parameter-table">
+    <thead>
+        <tr>
+            <th>Parâmetro</th>
+            <th>Descrição</th>
+            <th>Exemplo</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>-i</code></td>
+            <td>Especifica o arquivo de entrada</td>
+            <td><code>-i video.mp4</code></td>
+        </tr>
+        <tr>
+            <td><code>-c:v</code></td>
+            <td>Define o codec de vídeo</td>
+            <td><code>-c:v libx264</code></td>
+        </tr>
+        <tr>
+            <td><code>-c:a</code></td>
+            <td>Define o codec de áudio</td>
+            <td><code>-c:a aac</code></td>
+        </tr>
+        <tr>
+            <td><code>-b:v</code></td>
+            <td>Define o bitrate do vídeo</td>
+            <td><code>-b:v 1M</code></td>
+        </tr>
+        <tr>
+            <td><code>-b:a</code></td>
+            <td>Define o bitrate do áudio</td>
+            <td><code>-b:a 128k</code></td>
+        </tr>
+        <tr>
+            <td><code>-s</code></td>
+            <td>Define a resolução</td>
+            <td><code>-s 1920x1080</code></td>
+        </tr>
+        <tr>
+            <td><code>-r</code></td>
+            <td>Define o frame rate</td>
+            <td><code>-r 30</code></td>
+        </tr>
+        <tr>
+            <td><code>-y</code></td>
+            <td>Sobrescreve arquivos existentes</td>
+            <td><code>-y</code></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>🎯 Exemplos Práticos Avançados</h2>
+
+<div class="example-section">
+    <h3>Reduzir Tamanho do Arquivo (Compressão)</h3>
+    <div class="command-block">
+        <button class="copy-btn" onclick="copyToClipboard(this)">Copiar</button>
+        <pre><code># Compressão alta qualidade
+ffmpeg -i input.mp4 -c:v libx264 -crf 23 -c:a aac -b:a 128k output.mp4
+
+# Compressão máxima (menor qualidade)
+ffmpeg -i input.mp4 -c:v libx264 -crf 30 -c:a aac -b:a 64k output.mp4</code></pre>
+    </div>
+</div>
+
+<div class="example-section">
+    <h3>Alterar Resolução</h3>
+    <div class="command-block">
+        <button class="copy-btn" onclick="copyToClipboard(this)">Copiar</button>
+        <pre><code># Converter para HD (1280x720)
+ffmpeg -i input.mp4 -s 1280x720 -c:v libx264 -c:a aac output_hd.mp4
+
+# Converter para Full HD (1920x1080)
+ffmpeg -i input.mp4 -s 1920x1080 -c:v libx264 -c:a aac output_fhd.mp4
+
+# Redimensionar mantendo proporção
+ffmpeg -i input.mp4 -vf scale=1280:-1 -c:v libx264 -c:a aac output.mp4</code></pre>
+    </div>
+</div>
+
+<div class="example-section">
+    <h3>Extrair Áudio do Vídeo</h3>
+    <div class="command-block">
+        <button class="copy-btn" onclick="copyToClipboard(this)">Copiar</button>
+        <pre><code># Extrair como MP3
+ffmpeg -i video.mp4 -vn -c:a mp3 -b:a 192k audio.mp3
+
+# Extrair como AAC
+ffmpeg -i video.mp4 -vn -c:a aac -b:a 128k audio.aac
+
+# Extrair sem recodificar
+ffmpeg -i video.mp4 -vn -c:a copy audio.aac</code></pre>
+    </div>
+</div>
+
+<div class="example-section">
+    <h3>Cortar/Trimmar Vídeo</h3>
+    <div class="command-block">
+        <button class="copy-btn" onclick="copyToClipboard(this)">Copiar</button>
+        <pre><code># Cortar do segundo 30 ao 90 (1 minuto de duração)
+ffmpeg -i input.mp4 -ss 30 -t 60 -c copy output.mp4
+
+# Cortar os primeiros 10 segundos
+ffmpeg -i input.mp4 -ss 10 -c copy output.mp4
+
+# Cortar do minuto 2 ao minuto 5
+ffmpeg -i input.mp4 -ss 00:02:00 -to 00:05:00 -c copy output.mp4</code></pre>
+    </div>
+</div>
+
+<h2>🚀 Conversão em Lote</h2>
+
+<div class="example-section">
+    <h3>Windows (PowerShell)</h3>
+    <div class="command-block">
+        <button class="copy-btn" onclick="copyToClipboard(this)">Copiar</button>
+        <pre><code># Converter todos os MP4 para AVI
+Get-ChildItem *.mp4 | ForEach-Object {
+    ffmpeg -i $_.Name -c:v libx264 -c:a aac ($_.BaseName + ".avi")
+}</code></pre>
+    </div>
+</div>
+
+<div class="example-section">
+    <h3>Linux/macOS (Bash)</h3>
+    <div class="command-block">
+        <button class="copy-btn" onclick="copyToClipboard(this)">Copiar</button>
+        <pre><code># Converter todos os MP4 para AVI
+for file in *.mp4; do
+    ffmpeg -i "$file" -c:v libx264 -c:a aac "${file%.mp4}.avi"
+done
+
+# Comprimir todos os vídeos na pasta
+for file in *.mp4; do
+    ffmpeg -i "$file" -c:v libx264 -crf 23 -c:a aac "compressed_${file}"
+done</code></pre>
+    </div>
+</div>
+
+<div class="warning-box">
+    <strong>⚠️ Dicas Importantes:</strong>
+    <ul>
+        <li>Sempre faça backup dos arquivos originais antes de converter</li>
+        <li>Use o parâmetro <code>-y</code> para sobrescrever arquivos automaticamente</li>
+        <li>O valor CRF entre 18-28 oferece boa qualidade (18 = melhor qualidade, 28 = menor arquivo)</li>
+        <li>Para conversões longas, considere usar <code>-progress</code> para acompanhar o progresso</li>
+        <li>Verifique sempre se o arquivo de saída foi gerado corretamente</li>
+    </ul>
+</div>
+
+<h2>📊 Obter Informações do Vídeo</h2>
+<div class="command-block">
+    <button class="copy-btn" onclick="copyToClipboard(this)">Copiar</button>
+    <pre><code># Informações detalhadas do arquivo
+ffprobe -v quiet -print_format json -show_format -show_streams video.mp4
+
+# Informações básicas
+ffmpeg -i video.mp4 -f null - 2>&1 | head -20</code></pre>
+</div>
+
+<div class="info-box">
+    <strong>🎯 API de Conversão:</strong><br>
+    Este servidor também oferece uma API REST para conversão de vídeos. 
+    Envie seus arquivos via POST para <code>/convert?output_format=FORMATO</code>
+    onde FORMATO pode ser mp4, avi ou mkv.
+</div>
+{% endblock %}

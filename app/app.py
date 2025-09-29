@@ -2,8 +2,11 @@ import os
 import subprocess
 import uuid
 import logging
-from flask import Flask, request, send_file, jsonify
+import time
+from flask import Flask, request, send_file, jsonify, render_template
 from prometheus_flask_exporter import PrometheusMetrics
+from prometheus_client import make_wsgi_app
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 # Configuração básica de logs
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -12,12 +15,46 @@ app = Flask(__name__)
 # Adiciona o exportador de métricas do Prometheus à aplicação Flask
 metrics = PrometheusMetrics(app)
 
+# static information as metric
+metrics.info('app_info', 'Application info', version='1.0.3')
+
 # Define o limite máximo de tamanho do arquivo para 100 MB
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 
 
 # Diretório temporário dentro do contêiner
 TEMP_DIR = "/tmp"
 ALLOWED_FORMATS = {"mp4", "avi", "mkv"}
+
+@app.route('/load-test')
+def load_test():
+    """
+    Endpoint para gerar carga de CPU artificialmente e testar o HPA.
+    Executa um cálculo intensivo por um determinado período.
+    """
+    try:
+        duration_seconds = int(request.args.get('duration', 20))
+        logging.info(f"Iniciando teste de carga de CPU por {duration_seconds} segundos.")
+        
+        start_time = time.time()
+        while time.time() - start_time < duration_seconds:
+            # Operação matemática intensiva para consumir CPU
+            _ = [x**2 for x in range(10000)]
+            
+        logging.info("Teste de carga de CPU finalizado.")
+        return jsonify({"status": "success", "message": f"Carga de CPU gerada por {duration_seconds} segundos."}), 200
+    except Exception as e:
+        logging.error(f"Erro durante o teste de carga: {str(e)}")
+        return jsonify({"error": "Ocorreu um erro durante o teste de carga"}), 500
+
+@app.route('/')
+@app.route('/instructions')
+def video_conversion_instructions():
+    """
+    Endpoint que retorna uma página HTML com instruções detalhadas 
+    para conversão de vídeos usando FFmpeg via linha de comando.
+    """
+    logging.info("Página de instruções acessada")
+    return render_template('instructions.html')
 
 @app.route('/convert', methods=['POST'])
 def convert_video():
@@ -100,6 +137,11 @@ def request_entity_too_large(error):
     """
     logging.warning("Tentativa de upload de arquivo maior que o limite de 100MB.")
     return jsonify(error="O arquivo é muito grande. O limite é de 100MB."), 413
+
+# Cria o app combinado
+app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+    '/metrics': make_wsgi_app()
+})
 
 
 if __name__ == '__main__':
