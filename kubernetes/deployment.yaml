@@ -38,3 +38,12 @@ spec:
           ports:
             # A porta que o contêiner expõe
             - containerPort: 5000
+          # Define os recursos de CPU solicitados e os limites para o contêiner.
+          # Isso é ESSENCIAL para o HPA funcionar.
+          # "200m" significa 20% de um núcleo de CPU.
+          resources:
+            requests:
+              cpu: "200m"
+            limits:
+              cpu: "500m"
+
